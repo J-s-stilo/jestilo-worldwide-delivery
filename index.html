@@ -908,10 +908,6 @@ footer a{
   box-shadow:0 18px 50px rgba(0,0,0,.18);
 }
 
-.video-box + .video-box{
-  margin-top:25px;
-}
-
 .video-box video{
   display:block;
   width:100%;
@@ -941,6 +937,215 @@ footer a{
 .video-message span{
   color:#e1e6e9;
   font-size:14px;
+}
+
+/* ANIMATED DELIVERY INFORMATION */
+
+.delivery-info-box{
+  position:relative;
+  max-width:1000px;
+  min-height:330px;
+  margin:25px auto 0;
+  overflow:hidden;
+  border-radius:16px;
+  background:
+    linear-gradient(
+      135deg,
+      #0b1724,
+      #123944
+    );
+  color:#fff;
+  box-shadow:0 18px 50px rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.delivery-info-box::before{
+  content:"";
+  position:absolute;
+  width:280px;
+  height:280px;
+  border-radius:50%;
+  background:rgba(24,166,166,.15);
+  right:-80px;
+  top:-90px;
+  animation:deliveryFloat 6s ease-in-out infinite;
+}
+
+.delivery-info-box::after{
+  content:"";
+  position:absolute;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:rgba(115,216,216,.08);
+  left:-60px;
+  bottom:-70px;
+  animation:deliveryFloatReverse 7s ease-in-out infinite;
+}
+
+.delivery-info-content{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  gap:30px;
+  padding:50px;
+  min-height:330px;
+  animation:deliveryContent 5s ease-in-out infinite;
+}
+
+.delivery-info-icon{
+  width:85px;
+  height:85px;
+  min-width:85px;
+  border-radius:20px;
+  background:#168f9b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:40px;
+  box-shadow:0 12px 30px rgba(0,0,0,.25);
+  animation:deliveryIcon 3s ease-in-out infinite;
+}
+
+.delivery-info-label{
+  color:#73d8d8;
+  font-size:12px;
+  font-weight:bold;
+  letter-spacing:1.5px;
+  margin-bottom:8px;
+}
+
+.delivery-info-box h3{
+  font-size:32px;
+  margin:0 0 12px;
+}
+
+.delivery-info-box p{
+  color:#d0d9de;
+  font-size:15px;
+  line-height:1.7;
+  max-width:700px;
+  margin:0;
+}
+
+.delivery-info-points{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:22px;
+}
+
+.delivery-info-points span{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  padding:9px 13px;
+  border-radius:20px;
+  font-size:12px;
+  color:#e5edef;
+}
+
+.delivery-info-box-second{
+  background:
+    linear-gradient(
+      135deg,
+      #071019,
+      #16404a
+    );
+}
+
+.delivery-progress{
+  display:flex;
+  align-items:center;
+  margin-top:25px;
+  width:100%;
+  max-width:760px;
+}
+
+.progress-stage{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#9baab2;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.progress-stage span{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#33434c;
+  color:#fff;
+  font-weight:bold;
+}
+
+.progress-stage.active{
+  color:#fff;
+}
+
+.progress-stage.active span{
+  background:#168f9b;
+  box-shadow:0 0 0 5px rgba(24,166,166,.15);
+}
+
+.progress-line{
+  flex:1;
+  height:2px;
+  background:rgba(255,255,255,.15);
+  margin:0 10px;
+  min-width:20px;
+}
+
+@keyframes deliveryFloat{
+
+  0%,100%{
+    transform:translate(0,0);
+  }
+
+  50%{
+    transform:translate(-25px,30px);
+  }
+
+}
+
+@keyframes deliveryFloatReverse{
+
+  0%,100%{
+    transform:translate(0,0);
+  }
+
+  50%{
+    transform:translate(25px,-20px);
+  }
+
+}
+
+@keyframes deliveryContent{
+
+  0%,100%{
+    transform:translateY(0);
+  }
+
+  50%{
+    transform:translateY(-5px);
+  }
+
+}
+
+@keyframes deliveryIcon{
+
+  0%,100%{
+    transform:translateY(0) rotate(0deg);
+  }
+
+  50%{
+    transform:translateY(-8px) rotate(3deg);
+  }
+
 }
 
 /* RESPONSIVE */
@@ -1048,6 +1253,42 @@ footer a{
   .video-box video{
     height:360px;
   }
+
+  .delivery-info-content{
+    flex-direction:column;
+    align-items:flex-start;
+    padding:35px 25px;
+    gap:20px;
+  }
+
+  .delivery-info-box{
+    min-height:420px;
+  }
+
+  .delivery-info-box h3{
+    font-size:25px;
+  }
+
+  .delivery-info-points{
+    gap:7px;
+  }
+
+  .delivery-info-points span{
+    font-size:11px;
+  }
+
+  .delivery-progress{
+    overflow:hidden;
+  }
+
+  .progress-stage strong{
+    display:none;
+  }
+
+  .progress-line{
+    min-width:15px;
+  }
+
 }
 </style>
 </head>
@@ -1533,6 +1774,8 @@ footer a{
 </section>
 
 
+<!-- DELIVERY INFORMATION / VIDEO REPLACEMENT -->
+
 <section class="delivery-video">
 
   <div class="container">
@@ -1554,6 +1797,8 @@ footer a{
 
     </div>
 
+
+    <!-- FIRST VIDEO KEPT -->
 
     <div class="video-box">
 
@@ -1587,64 +1832,105 @@ footer a{
     </div>
 
 
-    <div class="video-box">
+    <!-- REPLACEMENT PANEL 1 -->
 
-      <video
-        controls
-        playsinline
-        preload="metadata"
-      >
+    <div class="delivery-info-box">
 
-        <source
-          src="./6169600-uhd_3840_2160_25fps.mp4"
-          type="video/mp4"
-        >
+      <div class="delivery-info-content">
 
-        Your browser does not support video playback.
+        <div class="delivery-info-icon">
+          🌍
+        </div>
 
-      </video>
+        <div>
 
-      <div class="video-message">
+          <div class="delivery-info-label">
+            JESTILO WORLDWIDE DELIVERY
+          </div>
 
-        <strong>
-          🚚 JESTILO WORLDWIDE DELIVERY
-        </strong>
+          <h3>
+            Worldwide Delivery You Can Follow
+          </h3>
 
-        <span>
-          Your shipment is moving toward its destination.
-        </span>
+          <p>
+            From pickup to final destination, JESTILO
+            helps keep shipment information organized
+            throughout the delivery journey.
+          </p>
+
+          <div class="delivery-info-points">
+
+            <span>✈️ International Shipping</span>
+            <span>🚚 Ground Transportation</span>
+            <span>📦 Package Handling</span>
+            <span>📍 Delivery Updates</span>
+
+          </div>
+
+        </div>
 
       </div>
 
     </div>
 
 
-    <div class="video-box">
+    <!-- REPLACEMENT PANEL 2 -->
 
-      <video
-        controls
-        playsinline
-        preload="metadata"
-      >
+    <div class="delivery-info-box delivery-info-box-second">
 
-        <source
-          src="./6169600-uhd_3840_2160_25fps (1).mp4"
-          type="video/mp4"
-        >
+      <div class="delivery-info-content">
 
-        Your browser does not support video playback.
+        <div class="delivery-info-icon">
+          📦
+        </div>
 
-      </video>
+        <div>
 
-      <div class="video-message">
+          <div class="delivery-info-label">
+            SHIPMENT JOURNEY
+          </div>
 
-        <strong>
-          🌍 JESTILO WORLDWIDE DELIVERY
-        </strong>
+          <h3>
+            Your Package. Our Delivery Journey.
+          </h3>
 
-        <span>
-          Your shipment journey continues safely.
-        </span>
+          <p>
+            Shipments can move through several stages,
+            including processing, transportation,
+            destination arrival and final delivery.
+          </p>
+
+          <div class="delivery-progress">
+
+            <div class="progress-stage active">
+              <span>1</span>
+              <strong>Received</strong>
+            </div>
+
+            <div class="progress-line"></div>
+
+            <div class="progress-stage">
+              <span>2</span>
+              <strong>Processing</strong>
+            </div>
+
+            <div class="progress-line"></div>
+
+            <div class="progress-stage">
+              <span>3</span>
+              <strong>In Transit</strong>
+            </div>
+
+            <div class="progress-line"></div>
+
+            <div class="progress-stage">
+              <span>4</span>
+              <strong>Delivered</strong>
+            </div>
+
+          </div>
+
+        </div>
 
       </div>
 

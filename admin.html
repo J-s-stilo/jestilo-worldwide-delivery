@@ -1037,7 +1037,6 @@ document
 function editShipment(shipment){
 
   try{
-
     if(typeof shipment === "string"){
       shipment = JSON.parse(decodeURIComponent(shipment));
     }
@@ -1461,8 +1460,6 @@ async function loadShipments(){
     }
 
 
-    window.currentShipments = data;
-
     box.innerHTML = `
 
       <table>
@@ -1484,14 +1481,7 @@ async function loadShipments(){
         </tr>
 
 
-        ${data.map(x => {
-
-          const shipmentData =
-            encodeURIComponent(
-              JSON.stringify(x)
-            );
-
-
+        ${data.map((x, index) => {
           return `
 
           <tr>
@@ -1565,10 +1555,10 @@ async function loadShipments(){
 
     `;
 
+    window.currentShipments = data;
     box.querySelectorAll("button.edit").forEach(button => {
       button.addEventListener("click", function(){
-        const index = Number(this.dataset.shipmentIndex);
-        const shipment = window.currentShipments[index];
+        const shipment = window.currentShipments[Number(this.dataset.shipmentIndex)];
         if(shipment) editShipment(shipment);
       });
     });

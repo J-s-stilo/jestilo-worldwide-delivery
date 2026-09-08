@@ -1034,16 +1034,13 @@ document
    EDIT SHIPMENT
 ========================================= */
 
-function editShipment(encodedShipment){
+function editShipment(shipment){
 
   try{
 
-    const shipment =
-      JSON.parse(
-        decodeURIComponent(
-          encodedShipment
-        )
-      );
+    if(typeof shipment === "string"){
+      shipment = JSON.parse(decodeURIComponent(shipment));
+    }
 
 
     document.getElementById("code").value =
@@ -1464,6 +1461,8 @@ async function loadShipments(){
     }
 
 
+    window.currentShipments = data;
+
     box.innerHTML = `
 
       <table>
@@ -1537,9 +1536,7 @@ async function loadShipments(){
               <button
                 type="button"
                 class="edit"
-                onclick="editShipment(
-                  '${shipmentData}'
-                )"
+                data-shipment-index="${index}"
               >
                 Edit
               </button>
@@ -1567,6 +1564,14 @@ async function loadShipments(){
       </table>
 
     `;
+
+    box.querySelectorAll("button.edit").forEach(button => {
+      button.addEventListener("click", function(){
+        const index = Number(this.dataset.shipmentIndex);
+        const shipment = window.currentShipments[index];
+        if(shipment) editShipment(shipment);
+      });
+    });
 
 
   }catch(error){

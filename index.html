@@ -1291,10 +1291,8 @@ footer a{
 
 }
 
-/* Private package room: tracking results are opened on a separate page. */
-#resultSection{
-  display:none !important;
-}
+/* Private shipment room is now the customer tracking destination. */
+#resultSection{display:none !important;}
 </style>
 </head>
 
@@ -2739,79 +2737,48 @@ setInterval(
 
 async function trackShipment(){
 
-  const input =
-    document.getElementById("trackingCode");
-
-  const errorBox =
-    document.getElementById("error");
-
-  const code =
-    input.value.trim().toUpperCase();
+  const input = document.getElementById("trackingCode");
+  const errorBox = document.getElementById("error");
+  const code = input.value.trim().toUpperCase();
 
   errorBox.style.display = "none";
   errorBox.textContent = "";
 
   if(!code){
-
-    errorBox.textContent =
-      "Please enter a tracking number.";
-
-    errorBox.style.display =
-      "block";
-
+    errorBox.textContent = "Please enter a tracking number.";
+    errorBox.style.display = "block";
     return;
   }
 
-  /*
-    The public homepage remains clean.
-    A valid tracking number opens the customer's
-    private shipment room instead of displaying
-    the package information underneath the homepage.
-  */
-
   try{
-
-    const response =
-      await fetch(
-        "/api/shipments/" +
-        encodeURIComponent(code)
-      );
+    const response = await fetch(
+      "/api/shipments/" + encodeURIComponent(code)
+    );
 
     if(!response.ok){
-
-      if(response.status === 404){
-
-        errorBox.textContent =
-          "Tracking number not found. Please check the number and try again.";
-
-      }else{
-
-        errorBox.textContent =
-          "Unable to retrieve shipment information. Please try again.";
-
-      }
-
-      errorBox.style.display =
-        "block";
-
+      errorBox.textContent = response.status === 404
+        ? "Tracking number not found. Please check the number and try again."
+        : "Unable to retrieve shipment information. Please try again.";
+      errorBox.style.display = "block";
       return;
     }
 
+    const shipment = await response.json();
+
+    /*
+      A valid tracking number opens the customer's private shipment room.
+      The public homepage stays clean; all shipment details are shown there.
+    */
     window.location.href =
       "/package-room.html?code=" +
-      encodeURIComponent(code);
+      encodeURIComponent(shipment.code || code);
 
   }catch(error){
-
     console.error(error);
-
     errorBox.textContent =
       "Unable to connect to the tracking service. Please try again.";
-
-    errorBox.style.display =
-      "block";
+    errorBox.style.display = "block";
   }
-
 }
 
 

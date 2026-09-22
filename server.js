@@ -17,6 +17,16 @@ app.get("/admin", (req, res) => {
 });
 
 
+/*
+ * PRIVATE CUSTOMER SHIPMENT ROOM
+ * package-room.html must sit beside server.js/index.html.
+ */
+app.get("/package-room.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "package-room.html"));
+});
+
+
+
 /* =========================================
    DATABASE
 ========================================= */
@@ -88,38 +98,6 @@ async function setupDatabase() {
     )
   `);
 
-  /*
-     PACKAGE MALL
-     Multiple private purchased items can belong to one
-     shipment/tracking code.
-  */
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS package_mall_items (
-      id BIGSERIAL PRIMARY KEY,
-      tracking_code TEXT NOT NULL REFERENCES shipments(code) ON DELETE CASCADE,
-      product_name TEXT NOT NULL DEFAULT '',
-      description TEXT DEFAULT '',
-      image_url TEXT DEFAULT '',
-      price NUMERIC(14,2) DEFAULT 0,
-      currency TEXT DEFAULT '',
-      quantity INTEGER DEFAULT 1,
-      size TEXT DEFAULT '',
-      color TEXT DEFAULT '',
-      style TEXT DEFAULT '',
-      seller TEXT DEFAULT '',
-      purchase_status TEXT DEFAULT 'Purchased',
-      purchase_date TEXT DEFAULT '',
-      receipt_url TEXT DEFAULT '',
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    )
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_package_mall_items_tracking_code
-    ON package_mall_items(tracking_code)
-  `);
-
 
   const columns = [
     ["customer", "TEXT DEFAULT ''"],
@@ -149,6 +127,36 @@ async function setupDatabase() {
 
   }
 
+
+
+  /* =========================================
+     PURCHASED ITEMS / PACKAGE MALL
+     Linked directly to the shipment tracking code.
+  ========================================= */
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS package_mall_items (
+      id BIGSERIAL PRIMARY KEY,
+      tracking_code TEXT NOT NULL
+        REFERENCES shipments(code)
+        ON DELETE CASCADE,
+      product_name TEXT DEFAULT '',
+      image_url TEXT DEFAULT '',
+      price NUMERIC(14,2) DEFAULT 0,
+      currency TEXT DEFAULT 'USD',
+      quantity INTEGER DEFAULT 1,
+      seller TEXT DEFAULT '',
+      purchase_status TEXT DEFAULT 'Purchased',
+      purchase_date TEXT DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_package_mall_tracking_code
+    ON package_mall_items(tracking_code)
+  `);
 
   console.log("Database ready.");
 }
@@ -628,191 +636,167 @@ app.get(
 );
 
 
-
 /* =========================================
-   PACKAGE MALL — CUSTOMER
-   Returns only Mall items belonging to the
-   requested tracking code.
+   CUSTOMER — PURCHASED ITEMS
 ========================================= */
 
 app.get(
   "/api/shipments/:code/mall",
   async (req, res) => {
-
     try {
-
       const code =
         req.params.code
           .trim()
           .toUpperCase();
 
-      const shipmentResult =
+      const shipment =
         await pool.query(
           `
-            SELECT code
-            FROM shipments
-            WHERE code = $1
+          SELECT code
+          FROM shipments
+          WHERE code = $1
           `,
           [code]
         );
 
-      if (shipmentResult.rows.length === 0) {
+      if (shipment.rows.length === 0) {
         return res.sendStatus(404);
       }
 
       const result =
         await pool.query(
           `
-            SELECT
-              id,
-              tracking_code,
-              product_name,
-              description,
-              image_url,
-              price,
-              currency,
-              quantity,
-              size,
-              color,
-              style,
-              seller,
-              purchase_status,
-              purchase_date,
-              receipt_url,
-              created_at,
-              updated_at
-            FROM package_mall_items
-            WHERE tracking_code = $1
-            ORDER BY created_at ASC, id ASC
+          SELECT
+            id,
+            tracking_code,
+            product_name,
+            image_url,
+            price,
+            currency,
+            quantity,
+            seller,
+            purchase_status,
+            purchase_date,
+            created_at,
+            updated_at
+          FROM package_mall_items
+          WHERE tracking_code = $1
+          ORDER BY created_at ASC, id ASC
           `,
           [code]
         );
 
-      res.json({
-        tracking_code: code,
-        items: result.rows
-      });
-
+      res.json(result.rows);
     } catch (error) {
-
-      console.error(
-        "Customer Mall error:",
-        error
-      );
-
+      console.error("Customer mall error:", error);
       res.status(500).json({
-        error: "Could not load package mall"
+        error: "Server error"
       });
-
     }
-
   }
 );
 
 
 /* =========================================
-   PACKAGE MALL — ADMIN LIST
+   ADMIN — LIST PURCHASED ITEMS
 ========================================= */
 
 app.get(
   "/api/admin/shipments/:code/mall",
   auth,
   async (req, res) => {
-
     try {
-
       const code =
         req.params.code
           .trim()
           .toUpperCase();
 
-      const shipmentResult =
-        await pool.query(
-          `
-            SELECT code
-            FROM shipments
-            WHERE code = $1
-          `,
-          [code]
-        );
-
-      if (shipmentResult.rows.length === 0) {
-        return res.status(404).json({
-          error: "Shipment not found"
-        });
-      }
-
       const result =
         await pool.query(
           `
-            SELECT *
-            FROM package_mall_items
-            WHERE tracking_code = $1
-            ORDER BY created_at ASC, id ASC
+          SELECT *
+          FROM package_mall_items
+          WHERE tracking_code = $1
+          ORDER BY created_at ASC, id ASC
           `,
           [code]
         );
 
-      res.json({
-        tracking_code: code,
-        items: result.rows
-      });
-
+      res.json(result.rows);
     } catch (error) {
-
-      console.error(
-        "Admin Mall list error:",
-        error
-      );
-
+      console.error("Admin mall list error:", error);
       res.status(500).json({
-        error: "Could not load package mall"
+        error: "Server error"
       });
-
     }
-
   }
 );
 
 
 /* =========================================
-   PACKAGE MALL — ADMIN ADD ITEM
+   ADMIN — ADD PURCHASED ITEM
 ========================================= */
 
 app.post(
   "/api/admin/shipments/:code/mall",
   auth,
   async (req, res) => {
-
     try {
-
       const code =
         req.params.code
           .trim()
           .toUpperCase();
 
-      const shipmentResult =
+      const shipment =
         await pool.query(
           `
-            SELECT code
-            FROM shipments
-            WHERE code = $1
+          SELECT code
+          FROM shipments
+          WHERE code = $1
           `,
           [code]
         );
 
-      if (shipmentResult.rows.length === 0) {
+      if (shipment.rows.length === 0) {
         return res.status(404).json({
           error: "Shipment not found"
         });
       }
 
-      const data =
-        req.body || {};
+      const data = req.body || {};
 
       const productName =
+        String(data.product_name || "").trim();
+
+      const imageUrl =
+        String(data.image_url || "").trim();
+
+      const seller =
+        String(data.seller || "").trim();
+
+      const currency = "USD";
+
+      const quantity =
+        Math.max(
+          1,
+          parseInt(data.quantity, 10) || 1
+        );
+
+      const priceNumber =
+        Number(data.price);
+
+      const price =
+        Number.isFinite(priceNumber) && priceNumber >= 0
+          ? priceNumber
+          : 0;
+
+      const purchaseDate =
+        String(data.purchase_date || "").trim();
+
+      const purchaseStatus =
         String(
-          data.product_name || ""
+          data.purchase_status ||
+          "Purchased"
         ).trim();
 
       if (!productName) {
@@ -821,143 +805,101 @@ app.post(
         });
       }
 
-      const price =
-        data.price === "" ||
-        data.price === null ||
-        data.price === undefined
-          ? 0
-          : Number(data.price);
-
-      if (
-        !Number.isFinite(price) ||
-        price < 0
-      ) {
-        return res.status(400).json({
-          error: "Invalid price"
-        });
-      }
-
-      const quantity =
-        data.quantity === "" ||
-        data.quantity === null ||
-        data.quantity === undefined
-          ? 1
-          : Number(data.quantity);
-
-      if (
-        !Number.isInteger(quantity) ||
-        quantity < 1
-      ) {
-        return res.status(400).json({
-          error: "Invalid quantity"
-        });
-      }
-
-      const now =
-        new Date().toISOString();
-
       const result =
         await pool.query(
           `
-            INSERT INTO package_mall_items
-            (
-              tracking_code,
-              product_name,
-              description,
-              image_url,
-              price,
-              currency,
-              quantity,
-              size,
-              color,
-              style,
-              seller,
-              purchase_status,
-              purchase_date,
-              receipt_url,
-              created_at,
-              updated_at
-            )
-            VALUES
-            (
-              $1,$2,$3,$4,$5,$6,$7,$8,
-              $9,$10,$11,$12,$13,$14,$15,$16
-            )
-            RETURNING *
+          INSERT INTO package_mall_items
+          (
+            tracking_code,
+            product_name,
+            image_url,
+            price,
+            currency,
+            quantity,
+            seller,
+            purchase_status,
+            purchase_date
+          )
+          VALUES
+          (
+            $1,$2,$3,$4,$5,$6,$7,$8,$9
+          )
+          RETURNING *
           `,
           [
             code,
             productName,
-            String(data.description || "").trim(),
-            String(data.image_url || "").trim(),
+            imageUrl,
             price,
-            String(data.currency || "").trim(),
+            currency,
             quantity,
-            String(data.size || "").trim(),
-            String(data.color || "").trim(),
-            String(data.style || "").trim(),
-            String(data.seller || "").trim(),
-            String(
-              data.purchase_status ||
-              "Purchased"
-            ).trim(),
-            String(data.purchase_date || "").trim(),
-            String(data.receipt_url || "").trim(),
-            now,
-            now
+            seller,
+            purchaseStatus,
+            purchaseDate
           ]
         );
 
-      res.status(201).json(
-        result.rows[0]
-      );
-
+      res.status(201).json(result.rows[0]);
     } catch (error) {
-
-      console.error(
-        "Add Mall item error:",
-        error
-      );
-
+      console.error("Add mall item error:", error);
       res.status(500).json({
-        error: "Could not add Mall item"
+        error: "Could not save purchased item"
       });
-
     }
-
   }
 );
 
 
 /* =========================================
-   PACKAGE MALL — ADMIN UPDATE ITEM
+   ADMIN — EDIT PURCHASED ITEM
 ========================================= */
 
 app.put(
   "/api/admin/mall/:id",
   auth,
   async (req, res) => {
-
     try {
-
       const id =
-        Number(req.params.id);
+        Number.parseInt(req.params.id, 10);
 
-      if (
-        !Number.isInteger(id) ||
-        id < 1
-      ) {
+      if (!Number.isInteger(id)) {
         return res.status(400).json({
-          error: "Invalid item ID"
+          error: "Invalid item id"
         });
       }
 
-      const data =
-        req.body || {};
+      const data = req.body || {};
 
       const productName =
+        String(data.product_name || "").trim();
+
+      const imageUrl =
+        String(data.image_url || "").trim();
+
+      const seller =
+        String(data.seller || "").trim();
+
+      const quantity =
+        Math.max(
+          1,
+          parseInt(data.quantity, 10) || 1
+        );
+
+      const priceNumber =
+        Number(data.price);
+
+      const price =
+        Number.isFinite(priceNumber) && priceNumber >= 0
+          ? priceNumber
+          : 0;
+
+      const purchaseDate =
+        String(data.purchase_date || "").trim();
+
+      const purchaseStatus =
         String(
-          data.product_name || ""
+          data.purchase_status ||
+          "Purchased"
         ).trim();
 
       if (!productName) {
@@ -966,163 +908,88 @@ app.put(
         });
       }
 
-      const price =
-        data.price === "" ||
-        data.price === null ||
-        data.price === undefined
-          ? 0
-          : Number(data.price);
-
-      if (
-        !Number.isFinite(price) ||
-        price < 0
-      ) {
-        return res.status(400).json({
-          error: "Invalid price"
-        });
-      }
-
-      const quantity =
-        data.quantity === "" ||
-        data.quantity === null ||
-        data.quantity === undefined
-          ? 1
-          : Number(data.quantity);
-
-      if (
-        !Number.isInteger(quantity) ||
-        quantity < 1
-      ) {
-        return res.status(400).json({
-          error: "Invalid quantity"
-        });
-      }
-
       const result =
         await pool.query(
           `
-            UPDATE package_mall_items
-            SET
-              product_name = $1,
-              description = $2,
-              image_url = $3,
-              price = $4,
-              currency = $5,
-              quantity = $6,
-              size = $7,
-              color = $8,
-              style = $9,
-              seller = $10,
-              purchase_status = $11,
-              purchase_date = $12,
-              receipt_url = $13,
-              updated_at = $14
-            WHERE id = $15
-            RETURNING *
+          UPDATE package_mall_items
+          SET
+            product_name = $1,
+            image_url = $2,
+            price = $3,
+            currency = 'USD',
+            quantity = $4,
+            seller = $5,
+            purchase_status = $6,
+            purchase_date = $7,
+            updated_at = NOW()
+          WHERE id = $8
+          RETURNING *
           `,
           [
             productName,
-            String(data.description || "").trim(),
-            String(data.image_url || "").trim(),
+            imageUrl,
             price,
-            String(data.currency || "").trim(),
             quantity,
-            String(data.size || "").trim(),
-            String(data.color || "").trim(),
-            String(data.style || "").trim(),
-            String(data.seller || "").trim(),
-            String(
-              data.purchase_status ||
-              "Purchased"
-            ).trim(),
-            String(data.purchase_date || "").trim(),
-            String(data.receipt_url || "").trim(),
-            new Date().toISOString(),
+            seller,
+            purchaseStatus,
+            purchaseDate,
             id
           ]
         );
 
       if (result.rows.length === 0) {
-        return res.status(404).json({
-          error: "Mall item not found"
-        });
+        return res.sendStatus(404);
       }
 
-      res.json(
-        result.rows[0]
-      );
-
+      res.json(result.rows[0]);
     } catch (error) {
-
-      console.error(
-        "Update Mall item error:",
-        error
-      );
-
+      console.error("Edit mall item error:", error);
       res.status(500).json({
-        error: "Could not update Mall item"
+        error: "Could not update purchased item"
       });
-
     }
-
   }
 );
 
 
 /* =========================================
-   PACKAGE MALL — ADMIN DELETE ITEM
+   ADMIN — DELETE PURCHASED ITEM
 ========================================= */
 
 app.delete(
   "/api/admin/mall/:id",
   auth,
   async (req, res) => {
-
     try {
-
       const id =
-        Number(req.params.id);
+        Number.parseInt(req.params.id, 10);
 
-      if (
-        !Number.isInteger(id) ||
-        id < 1
-      ) {
+      if (!Number.isInteger(id)) {
         return res.status(400).json({
-          error: "Invalid item ID"
+          error: "Invalid item id"
         });
       }
 
       const result =
         await pool.query(
           `
-            DELETE FROM package_mall_items
-            WHERE id = $1
-            RETURNING id
+          DELETE FROM package_mall_items
+          WHERE id = $1
           `,
           [id]
         );
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({
-          error: "Mall item not found"
-        });
+      if (result.rowCount === 0) {
+        return res.sendStatus(404);
       }
 
       res.sendStatus(204);
-
     } catch (error) {
-
-      console.error(
-        "Delete Mall item error:",
-        error
-      );
-
+      console.error("Delete mall item error:", error);
       res.status(500).json({
-        error: "Could not delete Mall item"
+        error: "Could not delete purchased item"
       });
-
     }
-
   }
 );
 

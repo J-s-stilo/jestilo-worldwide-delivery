@@ -704,25 +704,6 @@ td{
   ></textarea>
 
 
-  <button
-    type="button"
-    onclick="saveShipment()"
-  >
-    Save Shipment
-  </button>
-
-  <button
-    type="button"
-    class="clear"
-    onclick="clearForm()"
-  >
-    Clear
-  </button>
-
-  <p id="saveMessage"></p>
-
-
-
   <hr>
 
   <!-- =========================================
@@ -746,20 +727,16 @@ td{
     These items will appear in that customer's Package Mall room after tracking.
   </p>
 
-  <label>
-    Tracking Number for Mall
-  </label>
-
-  <input
-    id="mall_tracking_code"
-    placeholder="Example: RT_61_818"
-  >
+  <p class="help">
+    These purchased items belong to the tracking number above.
+    Enter the shipment tracking number first, then add the items here.
+  </p>
 
   <button
     type="button"
-    onclick="loadMallItems()"
+    onclick="openPackageItems()"
   >
-    Load Package Mall
+    ＋ Add Items
   </button>
 
   <div
@@ -780,7 +757,7 @@ td{
       </h3>
 
       <p id="mallItemCount" class="help" style="margin:6px 0 18px">
-        Items added: 0
+        Items added to this shipment: 0
       </p>
 
       <label>
@@ -972,6 +949,27 @@ td{
     </div>
 
   </div>
+
+
+
+  <button
+    type="button"
+    onclick="saveShipment()"
+  >
+    Save Shipment
+  </button>
+
+  <button
+    type="button"
+    class="clear"
+    onclick="clearForm()"
+  >
+    Clear
+  </button>
+
+  <p id="saveMessage"></p>
+
+
 
   <hr>
 
@@ -2008,16 +2006,27 @@ document
 
 /* LOAD MALL */
 
+function getShipmentTrackingCode(){
+  return document.getElementById("code").value.trim().toUpperCase();
+}
+
+async function openPackageItems(){
+  const code = getShipmentTrackingCode();
+  const message = document.getElementById("mallMessage");
+  if(!code){
+    message.className = "error";
+    message.textContent = "Enter the shipment tracking number above first.";
+    return;
+  }
+  currentMallTrackingCode = code;
+  document.getElementById("mallForm").classList.remove("hidden");
+  await loadMallItems();
+  document.getElementById("mallForm").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
 async function loadMallItems(){
 
-  const code =
-    document
-      .getElementById(
-        "mall_tracking_code"
-      )
-      .value
-      .trim()
-      .toUpperCase();
+  const code = getShipmentTrackingCode();
 
   const message =
     document.getElementById(
@@ -2124,7 +2133,7 @@ function renderMallItems(items){
 
   const count = document.getElementById("mallItemCount");
   if(count){
-    count.textContent = "Items added: " + items.length;
+    count.textContent = "Items added to this shipment: " + items.length;
   }
 
   if(!items.length){
@@ -2225,12 +2234,10 @@ function renderMallItems(items){
 
 async function addMallItem(){
 
+  currentMallTrackingCode = getShipmentTrackingCode();
+
   if(!currentMallTrackingCode){
-
-    alert(
-      "Load a tracking number first."
-    );
-
+    alert("Enter the shipment tracking number above first.");
     return;
   }
 
@@ -2460,8 +2467,9 @@ function editMallItem(item){
 
 async function saveMallItemChanges(){
 
+  currentMallTrackingCode = getShipmentTrackingCode();
   if(!editingMallItemId || !currentMallTrackingCode){
-    alert("Load a tracking number first.");
+    alert("Enter the shipment tracking number above first.");
     return;
   }
 

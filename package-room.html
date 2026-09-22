@@ -3,40 +3,779 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JESTILO — Private Shipment Room</title>
+
+<title>JESTILO | Private Package Room</title>
+
+<meta
+  name="description"
+  content="Private shipment and purchased-items room for JESTILO Worldwide Delivery."
+>
+
 <style>
-:root{--navy:#071426;--navy2:#0c1d33;--blue:#1478ee;--blue2:#0b63d8;--text:#12233b;--muted:#718096;--line:#e6edf5;--bg:#f4f7fb;--white:#fff;--green:#19b879;--greenbg:#ddfaed}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}button{font:inherit}
-.top{height:90px;background:linear-gradient(110deg,#071426,#0d2037);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:5}.brand{display:flex;align-items:center;gap:12px}.brandmark{font-size:31px;font-weight:900;letter-spacing:-2px}.plane{color:#f4b900;font-size:27px}.brand small{display:block;color:#b8c7d8;font-size:11px;letter-spacing:1.8px;margin-top:-2px}.top-right{display:flex;align-items:center;gap:12px}.lock{font-size:23px}.top-title{font-weight:800;font-size:15px}.top-sub{font-size:12px;color:#b9c8d9;margin-top:3px}
-.layout{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 90px)}.side{background:linear-gradient(180deg,#071426,#0a192c);color:#d8e3ef;padding:20px 10px;display:flex;flex-direction:column}.nav{display:flex;flex-direction:column;gap:7px}.nav a{padding:13px 15px;border-radius:8px;color:#e6eef7;text-decoration:none;font-size:14px;font-weight:650;display:flex;gap:12px;align-items:center}.nav a.active,.nav a:hover{background:#116fe0;color:#fff}.side-bottom{margin-top:auto;padding:22px 10px 20px;color:#b6c6d7;text-align:center;font-size:12px;line-height:1.6}.side-logo{font-size:25px;font-weight:900;color:#fff}.side-logo span{color:#f4b900}.main{padding:22px 16px 35px;max-width:1240px;width:100%;margin:0 auto}.hero{background:linear-gradient(115deg,#102743,#153d63);border-radius:9px;color:#fff;padding:19px 24px;display:flex;align-items:center;justify-content:space-between;min-height:150px;overflow:hidden;position:relative}.hero:after{content:'✈';position:absolute;right:35px;top:12px;font-size:125px;opacity:.18;transform:rotate(-5deg)}.pill{display:inline-block;background:#19b879;color:#fff;padding:7px 16px;border-radius:30px;font-size:12px;font-weight:800}.hero h1{margin:8px 0 4px;font-size:29px;position:relative;z-index:1}.hero p{margin:0;color:#d5e5f4;font-size:14px;position:relative;z-index:1}.hero .updated{margin-top:10px;font-size:12px;color:#b9cee3}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 265px;gap:16px;margin-top:16px}.card{background:#fff;border:1px solid var(--line);border-radius:9px;box-shadow:0 2px 8px rgba(17,38,63,.04);padding:20px}.card h2{font-size:17px;margin:0 0 18px}.section-head{display:flex;align-items:center;justify-content:space-between}.mapbtn,.support{border:1px solid #d7e5f5;background:#fff;color:#1268d7;padding:9px 14px;border-radius:8px;font-weight:750;cursor:pointer}.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px 17px}.label{font-size:11px;color:#6f8195;margin-bottom:5px}.value{font-size:13px;font-weight:750;line-height:1.35;word-break:break-word}.status{display:inline-block;padding:5px 10px;border-radius:20px;background:var(--greenbg);color:#087b50;font-size:12px;font-weight:800}.route{display:flex;align-items:center;gap:12px}.route .value{font-size:14px}.arrow{font-size:22px;color:#6e86a0}
-.timeline{position:relative;padding-left:31px}.timeline:before{content:'';position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:#dce7f2}.event{position:relative;padding-bottom:25px}.dot{position:absolute;left:-29px;top:0;width:19px;height:19px;border-radius:50%;background:#fff;border:2px solid #cdd9e6}.event.done .dot{background:#18b878;border-color:#18b878}.event.current .dot{background:#1478ee;border-color:#1478ee;box-shadow:0 0 0 4px #e4f0ff}.event b{font-size:13px}.event small{display:block;color:#77879a;margin-bottom:4px;font-size:11px}
-.mall{margin-top:16px}.mall-title{display:flex;align-items:center;gap:10px}.count{background:#e8f1ff;color:#1768cf;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:800}.items{display:grid;grid-template-columns:1fr 1fr;gap:12px}.item{border:1px solid #e1e8f0;border-radius:8px;padding:10px;display:grid;grid-template-columns:132px 1fr;gap:13px;min-width:0}.item img{width:132px;height:132px;border-radius:7px;object-fit:cover;background:#edf2f7}.item-img-empty{width:132px;height:132px;border-radius:7px;background:#edf2f7;display:flex;align-items:center;justify-content:center;color:#9aa9b9;font-size:34px}.item h3{margin:4px 0 7px;font-size:14px}.price{font-size:17px;font-weight:900;margin-bottom:9px}.usd{font-size:10px;border:1px solid #cbd9e8;border-radius:5px;padding:3px 5px;vertical-align:middle;margin-left:4px}.meta{font-size:12px;color:#68798c;line-height:1.8}.badge{display:inline-block;padding:4px 8px;border-radius:14px;background:var(--greenbg);color:#087b50;font-weight:800;font-size:10px}.empty{padding:28px;text-align:center;color:#74869a;border:1px dashed #d5e0eb;border-radius:8px}
-.quick .row{display:flex;justify-content:space-between;gap:10px;padding:15px 0;border-bottom:1px solid var(--line);font-size:13px}.quick .row:last-child{border-bottom:0}.quick .row span:first-child{color:#718196}.quick .row b{text-align:right}.help{margin-top:16px}.help p{font-size:12px;line-height:1.6;color:#6f8094}.support{width:100%;background:#1478ee;color:#fff;border:0;margin-top:8px}.footer{background:#071426;color:#b6c5d5;text-align:center;padding:18px;font-size:11px;margin-top:25px}.loading{padding:50px;text-align:center;color:#708197}
-@media(max-width:980px){.info-grid{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr 240px}.items{grid-template-columns:1fr}}
-@media(max-width:700px){.top{height:76px;padding:0 15px}.brandmark{font-size:24px}.top-title{font-size:12px}.top-sub{font-size:10px}.layout{display:block}.side{display:none}.main{padding:12px}.hero{min-height:145px;padding:18px}.hero h1{font-size:24px}.hero:after{right:-3px;font-size:90px}.grid{display:block}.right{margin-top:12px}.card{padding:15px}.info-grid{grid-template-columns:1fr 1fr;gap:18px 12px}.item{grid-template-columns:100px 1fr}.item img,.item-img-empty{width:100px;height:100px}.items{grid-template-columns:1fr}.route{align-items:flex-start}.footer{margin-top:15px}}
-@media(max-width:430px){.info-grid{grid-template-columns:1fr}.hero h1{font-size:21px}.item{grid-template-columns:88px 1fr}.item img,.item-img-empty{width:88px;height:88px}.value{font-size:12px}}
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  min-height:100%;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f3f6f8;
+  color:#18202a;
+}
+
+body{
+  min-height:100vh;
+}
+
+.topbar{
+  background:#0b1724;
+  color:#fff;
+  min-height:72px;
+  display:flex;
+  align-items:center;
+}
+
+.topbar-inner{
+  width:min(1120px,92%);
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.logo{
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:.4px;
+}
+
+.logo span{
+  color:#18a6a6;
+}
+
+.back{
+  color:#fff;
+  text-decoration:none;
+  border:1px solid rgba(255,255,255,.25);
+  padding:10px 14px;
+  border-radius:7px;
+  font-size:13px;
+}
+
+.room{
+  width:min(1120px,92%);
+  margin:35px auto 70px;
+}
+
+.private-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:#e5f7f7;
+  color:#117b82;
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+.hero{
+  margin-top:16px;
+  background:#fff;
+  border-radius:16px;
+  padding:28px;
+  box-shadow:0 12px 35px rgba(11,23,36,.08);
+  border:1px solid #e4e9ed;
+}
+
+.hero h1{
+  margin:0 0 8px;
+  font-size:clamp(28px,5vw,44px);
+}
+
+.hero p{
+  margin:0;
+  color:#6c7780;
+  line-height:1.6;
+}
+
+.code{
+  margin-top:20px;
+  display:inline-block;
+  background:#0b1724;
+  color:#fff;
+  padding:11px 15px;
+  border-radius:8px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1.35fr;
+  gap:22px;
+  margin-top:22px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e4e9ed;
+  border-radius:14px;
+  padding:24px;
+  box-shadow:0 8px 25px rgba(11,23,36,.05);
+}
+
+.card h2{
+  margin:0 0 18px;
+  font-size:21px;
+}
+
+.details{
+  display:grid;
+  gap:13px;
+}
+
+.detail{
+  border-bottom:1px solid #edf0f2;
+  padding-bottom:12px;
+}
+
+.detail:last-child{
+  border-bottom:0;
+  padding-bottom:0;
+}
+
+.detail small{
+  display:block;
+  color:#7a858d;
+  margin-bottom:4px;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+.detail strong{
+  display:block;
+  line-height:1.45;
+}
+
+.status{
+  display:inline-block;
+  padding:7px 10px;
+  border-radius:999px;
+  background:#e5f7f7;
+  color:#117b82;
+  font-size:12px;
+}
+
+.description{
+  line-height:1.7;
+  color:#5e6972;
+  white-space:pre-wrap;
+}
+
+.items-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:18px;
+}
+
+.items-title h2{
+  margin:0;
+}
+
+.item-count{
+  color:#7a858d;
+  font-size:13px;
+}
+
+.items{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+
+.item{
+  border:1px solid #e2e7ea;
+  border-radius:13px;
+  overflow:hidden;
+  background:#fff;
+}
+
+.item-image{
+  width:100%;
+  height:230px;
+  object-fit:cover;
+  display:block;
+  background:#eef2f4;
+}
+
+.item-image.placeholder{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#89939b;
+  font-size:45px;
+}
+
+.item-body{
+  padding:17px;
+}
+
+.item-name{
+  margin:0 0 12px;
+  font-size:18px;
+}
+
+.price{
+  font-size:22px;
+  font-weight:900;
+  color:#0b1724;
+}
+
+.item-meta{
+  margin-top:13px;
+  display:grid;
+  gap:8px;
+  color:#68737c;
+  font-size:13px;
+}
+
+.item-meta strong{
+  color:#27313a;
+}
+
+.item-status{
+  margin-top:14px;
+}
+
+.loading,
+.empty,
+.error{
+  padding:25px;
+  border-radius:10px;
+  background:#f7f9fa;
+  color:#68737c;
+  text-align:center;
+}
+
+.error{
+  color:#a12626;
+  background:#fff1f1;
+}
+
+.timeline{
+  margin-top:22px;
+}
+
+.timeline-row{
+  display:flex;
+  gap:12px;
+  padding:12px 0;
+  border-bottom:1px solid #edf0f2;
+}
+
+.timeline-row:last-child{
+  border-bottom:0;
+}
+
+.dot{
+  width:10px;
+  height:10px;
+  margin-top:5px;
+  border-radius:50%;
+  background:#18a6a6;
+  flex:0 0 auto;
+}
+
+.footer-note{
+  text-align:center;
+  margin-top:28px;
+  color:#8a949b;
+  font-size:12px;
+}
+
+@media(max-width:820px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .items{
+    grid-template-columns:1fr;
+  }
+
+  .item-image{
+    height:260px;
+  }
+
+  .hero,.card{
+    padding:20px;
+  }
+}
 </style>
 </head>
+
 <body>
-<header class="top"><div class="brand"><div class="brandmark">JESTILO <span class="plane">✈</span><small>YOUR DELIVERY PARTNER</small></div></div><div class="top-right"><div class="lock">🔒</div><div><div class="top-title">Private Shipment Room</div><div class="top-sub">Tracking your package safely</div></div></div></header>
-<div class="layout">
-<aside class="side"><nav class="nav"><a class="active" href="#overview">⌂ <span>Shipment Overview</span></a><a href="#purchased">🛍 <span>Purchased Items</span></a><a href="#timeline">◉ <span>Tracking Updates</span></a><a href="#help">◉ <span>Contact Support</span></a></nav><div class="side-bottom"><div class="side-logo">JESTILO<span>✈</span></div><div>Shop Anywhere<br>We Deliver Everywhere</div></div></aside>
-<main class="main" id="app"><div class="loading">Loading your private shipment room…</div></main>
-</div>
-<footer class="footer">JESTILO &nbsp; • &nbsp; Safe &nbsp; • &nbsp; Fast &nbsp; • &nbsp; Reliable</footer>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">
+      JESTILO <span>WORLDWIDE DELIVERY</span>
+    </div>
+
+    <a class="back" href="/">
+      ← Back to Website
+    </a>
+  </div>
+</header>
+
+<main class="room">
+
+  <div class="private-badge">
+    🔒 Private Shipment Room
+  </div>
+
+  <section class="hero">
+    <h1>Your Shipment</h1>
+    <p>
+      This private room contains your shipment information
+      and the purchased items connected to your tracking number.
+    </p>
+
+    <div id="trackingCode" class="code">
+      Loading...
+    </div>
+  </section>
+
+  <div id="pageMessage" class="loading" style="margin-top:22px">
+    Loading your shipment...
+  </div>
+
+  <div id="content" style="display:none">
+
+    <div class="grid">
+
+      <section class="card">
+        <h2>Tracking Information</h2>
+
+        <div class="details">
+
+          <div class="detail">
+            <small>Status</small>
+            <strong>
+              <span id="status" class="status">—</span>
+            </strong>
+          </div>
+
+          <div class="detail">
+            <small>Customer</small>
+            <strong id="customer">—</strong>
+          </div>
+
+          <div class="detail">
+            <small>Origin</small>
+            <strong id="origin">—</strong>
+          </div>
+
+          <div class="detail">
+            <small>Destination</small>
+            <strong id="destination">—</strong>
+          </div>
+
+          <div class="detail">
+            <small>Current Location</small>
+            <strong id="location">—</strong>
+          </div>
+
+          <div class="detail">
+            <small>Estimated Delivery</small>
+            <strong id="delivery">—</strong>
+          </div>
+
+          <div class="detail">
+            <small>Last Updated</small>
+            <strong id="updated">—</strong>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Package Information</h2>
+
+        <div class="detail">
+          <small>Package</small>
+          <strong id="packageName">Shipment</strong>
+        </div>
+
+        <div style="height:18px"></div>
+
+        <div class="detail">
+          <small>Description</small>
+          <div id="description" class="description">
+            No package description available.
+          </div>
+        </div>
+
+        <div style="height:18px"></div>
+
+        <div class="detail">
+          <small>Latest Update</small>
+          <div id="note" class="description">
+            No additional update available.
+          </div>
+        </div>
+
+        <div id="timeline" class="timeline"></div>
+      </section>
+
+    </div>
+
+    <section class="card" style="margin-top:22px">
+
+      <div class="items-title">
+        <h2>Purchased Items</h2>
+        <span id="itemCount" class="item-count">
+          0 items
+        </span>
+      </div>
+
+      <div id="items" class="items">
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="footer-note">
+    JESTILO Worldwide Delivery • Private shipment room
+  </div>
+
+</main>
+
 <script>
-const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-const fmt=v=>{if(!v)return '-';const d=new Date(v);return isNaN(d)?esc(v):d.toLocaleString([], {dateStyle:'medium',timeStyle:'short'});};
-const money=v=>{const n=Number(v);return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}):'0.00'};
-function timeline(status){const s=String(status||'Order received').toLowerCase();const stages=['Order received','Processing','In transit','Arrived at destination','Out for delivery','Delivered'];let idx=stages.findIndex(x=>s.includes(x.toLowerCase()));if(idx<0){if(s.includes('transit'))idx=2;else if(s.includes('delivered'))idx=5;else idx=0}return stages.map((x,i)=>`<div class="event ${i<idx?'done':''} ${i===idx?'current':''}"><span class="dot"></span><small>${i===idx?'Current status':'Shipment stage'}</small><b>${esc(x)}</b></div>`).join('')}
-function itemCard(x){const img=x.image_url?`<img src="${esc(x.image_url)}" alt="${esc(x.product_name)}">`:`<div class="item-img-empty">🛍</div>`;return `<article class="item">${img}<div><h3>${esc(x.product_name||'Purchased Item')}</h3><div class="price">$${money(x.price)} <span class="usd">USD</span></div><div class="meta">Quantity: <b>${esc(x.quantity||1)}</b><br>Seller / Store: <b>${esc(x.seller||'-')}</b><br>Purchase Date: <b>${esc(x.purchase_date||'-')}</b><br>Status: <span class="badge">${esc(x.purchase_status||'Purchased')}</span></div></div></article>`}
-async function load(){const params=new URLSearchParams(location.search);const code=(params.get('code')||'').trim().toUpperCase();if(!code){location.href='/';return}try{const [sr,mr]=await Promise.all([fetch('/api/shipments/'+encodeURIComponent(code)),fetch('/api/shipments/'+encodeURIComponent(code)+'/mall')]);if(!sr.ok){location.href='/';return}const s=await sr.json();const items=mr.ok?await mr.json():[];const totalQty=items.reduce((a,x)=>a+(Number(x.quantity)||0),0);const total=items.reduce((a,x)=>a+(Number(x.price)||0)*(Number(x.quantity)||0),0);document.title='JESTILO — '+s.code;document.getElementById('app').innerHTML=`
-<section id="overview" class="hero"><div><span class="pill">${esc(s.status||'Order received')}</span><h1>${esc(s.code||code)}</h1><p>Your package is being handled by JESTILO Worldwide Delivery.</p><div class="updated">Last updated: ${fmt(s.updated)}</div></div></section>
-<div class="grid"><div>
-<section class="card"><div class="section-head"><h2>📦 &nbsp;Shipment Information</h2>${s.latitude&&s.longitude?'<button class="mapbtn" onclick="window.open(\'#\')">📍 Track on Map</button>':''}</div><div class="info-grid"><div><div class="label">Tracking Number</div><div class="value">${esc(s.code)}</div></div><div><div class="label">Customer</div><div class="value">${esc(s.customer||'-')}</div></div><div><div class="label">Email</div><div class="value">${esc(s.email||'-')}</div></div><div><div class="label">WhatsApp</div><div class="value">${esc(s.whatsapp||'-')}</div></div><div><div class="label">Origin</div><div class="value">${esc(s.origin||'-')}</div></div><div><div class="label">Destination</div><div class="value">${esc(s.destination||'-')}</div></div><div><div class="label">Current Location</div><div class="value">${esc(s.location||'-')}</div></div><div><div class="label">Estimated Delivery</div><div class="value">${fmt(s.estimated_delivery)}</div></div><div><div class="label">Status</div><div class="value"><span class="status">✓ ${esc(s.status||'Order received')}</span></div></div><div><div class="label">Last Update</div><div class="value">${fmt(s.updated)}</div></div><div><div class="label">Package</div><div class="value">${esc(s.item_name||'Shipment')}</div></div><div><div class="label">Description</div><div class="value">${esc(s.item_description||'-')}</div></div></div></section>
-<section id="purchased" class="card mall"><div class="section-head"><div class="mall-title"><h2>🛍 &nbsp;Purchased Items</h2><span class="count">${items.length} Item${items.length===1?'':'s'}</span></div></div><p style="margin:-8px 0 16px;color:#718096;font-size:12px">Items purchased with this shipment</p>${items.length?`<div class="items">${items.map(itemCard).join('')}</div>`:'<div class="empty">No purchased items have been added to this shipment yet.</div>'}</section>
-</div><aside class="right"><section id="timeline" class="card"><h2>◷ &nbsp;Shipment Timeline</h2><div class="timeline">${timeline(s.status)}</div></section><section class="card quick"><h2>ⓘ &nbsp;Quick Info</h2><div class="row"><span>Total Items</span><b>${totalQty||0}</b></div><div class="row"><span>Total Value</span><b>$${money(total)}</b></div><div class="row"><span>Shipment Status</span><b><span class="status">${esc(s.status||'-')}</span></b></div></section><section id="help" class="card help"><h2>◉ &nbsp;Need Help?</h2><p>If you have any questions about your shipment, feel free to contact JESTILO support.</p>${s.whatsapp?`<button class="support" onclick="location.href='https://wa.me/${encodeURIComponent(String(s.whatsapp).replace(/[^0-9]/g,''))}'">Contact Support</button>`:''}</section></aside></div>`}catch(e){console.error(e);document.getElementById('app').innerHTML='<div class="card" style="text-align:center;padding:50px">Unable to load this shipment room. Please return to the website and try again.</div>'}}
-load();
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function formatDate(value){
+  if(!value) return "—";
+
+  const date = new Date(value);
+
+  if(Number.isNaN(date.getTime())){
+    return String(value);
+  }
+
+  return date.toLocaleString(
+    undefined,
+    {
+      year:"numeric",
+      month:"short",
+      day:"numeric",
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
+}
+
+function setMessage(text, type){
+  const box = document.getElementById("pageMessage");
+  box.className = type || "loading";
+  box.textContent = text;
+  box.style.display = "block";
+}
+
+function updateTimeline(status){
+
+  const timeline =
+    document.getElementById("timeline");
+
+  const stages = [
+    "Shipment received",
+    "Processing",
+    "In transit",
+    "Out for delivery",
+    "Delivered"
+  ];
+
+  const current =
+    String(status || "").toLowerCase();
+
+  let activeIndex = 0;
+
+  stages.forEach((stage,index)=>{
+    if(
+      current.includes(
+        stage.toLowerCase()
+          .replace("shipment ","")
+      )
+    ){
+      activeIndex = index;
+    }
+  });
+
+  timeline.innerHTML = `
+    ${stages.map((stage,index)=>`
+      <div class="timeline-row">
+        <span
+          class="dot"
+          style="opacity:${index <= activeIndex ? "1" : ".25"}"
+        ></span>
+
+        <div>
+          <strong>${escapeHtml(stage)}</strong>
+          ${
+            index === activeIndex
+              ? `<span style="color:#18a6a6;font-size:12px"> Current status</span>`
+              : ""
+          }
+        </div>
+      </div>
+    `).join("")}
+  `;
+}
+
+function renderItems(items){
+
+  const box =
+    document.getElementById("items");
+
+  document.getElementById("itemCount").textContent =
+    items.length + (items.length === 1 ? " item" : " items");
+
+  if(!items.length){
+
+    box.innerHTML = `
+      <div class="empty" style="grid-column:1/-1">
+        No purchased items have been added to this shipment yet.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML =
+    items.map(item => {
+
+      const image =
+        item.image_url || "";
+
+      const price =
+        Number(item.price || 0).toFixed(2);
+
+      return `
+        <article class="item">
+
+          ${
+            image
+              ? `
+                <img
+                  class="item-image"
+                  src="${escapeHtml(image)}"
+                  alt="${escapeHtml(item.product_name || "Purchased item")}"
+                >
+              `
+              : `
+                <div class="item-image placeholder">
+                  🛍️
+                </div>
+              `
+          }
+
+          <div class="item-body">
+
+            <h3 class="item-name">
+              ${escapeHtml(item.product_name || "Purchased Item")}
+            </h3>
+
+            <div class="price">
+              $${price}
+            </div>
+
+            <div class="item-meta">
+
+              <div>
+                Quantity:
+                <strong>${escapeHtml(item.quantity || 1)}</strong>
+              </div>
+
+              <div>
+                Seller / Store:
+                <strong>${escapeHtml(item.seller || "—")}</strong>
+              </div>
+
+              <div>
+                Purchase Date:
+                <strong>
+                  ${escapeHtml(
+                    item.purchase_date
+                      ? String(item.purchase_date).slice(0,10)
+                      : "—"
+                  )}
+                </strong>
+              </div>
+
+            </div>
+
+            <div class="item-status">
+              <span class="status">
+                ${escapeHtml(item.purchase_status || "Purchased")}
+              </span>
+            </div>
+
+          </div>
+
+        </article>
+      `;
+    }).join("");
+}
+
+async function loadRoom(){
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const code =
+    (params.get("code") || "")
+      .trim()
+      .toUpperCase();
+
+  if(!code){
+
+    document.getElementById("trackingCode").textContent =
+      "NO TRACKING NUMBER";
+
+    setMessage(
+      "No tracking number was provided.",
+      "error"
+    );
+
+    return;
+  }
+
+  document.getElementById("trackingCode").textContent =
+    code;
+
+  try{
+
+    const shipmentResponse =
+      await fetch(
+        "/api/shipments/" +
+        encodeURIComponent(code)
+      );
+
+    if(!shipmentResponse.ok){
+
+      if(shipmentResponse.status === 404){
+
+        setMessage(
+          "Tracking number not found.",
+          "error"
+        );
+
+      }else{
+
+        setMessage(
+          "Unable to retrieve shipment information.",
+          "error"
+        );
+      }
+
+      return;
+    }
+
+    const shipment =
+      await shipmentResponse.json();
+
+    document.getElementById("status").textContent =
+      shipment.status || "Shipment received";
+
+    document.getElementById("customer").textContent =
+      shipment.customer || "—";
+
+    document.getElementById("origin").textContent =
+      shipment.origin || "—";
+
+    document.getElementById("destination").textContent =
+      shipment.destination || "—";
+
+    document.getElementById("location").textContent =
+      shipment.location || "—";
+
+    document.getElementById("delivery").textContent =
+      formatDate(shipment.estimated_delivery);
+
+    document.getElementById("updated").textContent =
+      formatDate(shipment.updated);
+
+    document.getElementById("packageName").textContent =
+      shipment.item_name || "Shipment";
+
+    document.getElementById("description").textContent =
+      shipment.item_description ||
+      "No package description available.";
+
+    document.getElementById("note").textContent =
+      shipment.note ||
+      "No additional update available.";
+
+    updateTimeline(shipment.status);
+
+    const mallResponse =
+      await fetch(
+        "/api/shipments/" +
+        encodeURIComponent(code) +
+        "/mall"
+      );
+
+    if(mallResponse.ok){
+
+      const mall =
+        await mallResponse.json();
+
+      renderItems(
+        Array.isArray(mall.items)
+          ? mall.items
+          : []
+      );
+
+    }else{
+
+      renderItems([]);
+
+    }
+
+    document.getElementById("pageMessage").style.display =
+      "none";
+
+    document.getElementById("content").style.display =
+      "block";
+
+  }catch(error){
+
+    console.error(error);
+
+    setMessage(
+      "Unable to connect to the shipment service.",
+      "error"
+    );
+  }
+}
+
+loadRoom();
 </script>
-</body></html>
+
+</body>
+</html>

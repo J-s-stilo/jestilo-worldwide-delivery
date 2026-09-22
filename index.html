@@ -1291,250 +1291,10 @@ footer a{
 
 }
 
-
-/* =========================
-   PRIVATE PACKAGE MALL ROOM
-   ========================= */
-
-.package-mall-room{
-  display:none;
-  background:#f4f7f9;
-  padding:70px 0 85px;
+/* Private package room: tracking results are opened on a separate page. */
+#resultSection{
+  display:none !important;
 }
-
-.package-mall-shell{
-  background:#fff;
-  border-radius:16px;
-  box-shadow:0 15px 45px rgba(0,0,0,.10);
-  overflow:hidden;
-}
-
-.mall-topbar{
-  background:linear-gradient(135deg,#0b1724,#123944);
-  color:#fff;
-  padding:30px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-  flex-wrap:wrap;
-}
-
-.mall-brand small{
-  display:block;
-  color:#73d8d8;
-  font-size:11px;
-  font-weight:bold;
-  letter-spacing:1.5px;
-  margin-bottom:7px;
-}
-
-.mall-brand h2{
-  margin:0;
-  font-size:30px;
-}
-
-.mall-brand p{
-  margin:8px 0 0;
-  color:#d3dde2;
-  font-size:14px;
-}
-
-.mall-room-code{
-  background:rgba(255,255,255,.09);
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:10px;
-  padding:12px 15px;
-  font-size:13px;
-}
-
-.mall-room-code strong{color:#fff}
-
-.mall-content{padding:30px}
-
-.mall-summary{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:25px;
-}
-
-.mall-summary-card{
-  background:#f7f8f9;
-  border:1px solid #e5e8eb;
-  border-radius:10px;
-  padding:17px;
-}
-
-.mall-summary-card small{
-  display:block;
-  color:#7b858d;
-  font-size:12px;
-  margin-bottom:6px;
-}
-
-.mall-summary-card strong{font-size:15px}
-
-.mall-section-title{
-  margin:25px 0 15px;
-  font-size:22px;
-}
-
-.mall-items-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-}
-
-.mall-item-card{
-  border:1px solid #e1e6e9;
-  border-radius:13px;
-  overflow:hidden;
-  background:#fff;
-  box-shadow:0 7px 22px rgba(0,0,0,.06);
-}
-
-.mall-item-image{
-  width:100%;
-  height:230px;
-  object-fit:cover;
-  display:block;
-  background:#eef2f4;
-}
-
-.mall-item-placeholder{
-  height:230px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#eef2f4;
-  color:#7c858d;
-  font-size:42px;
-}
-
-.mall-item-body{padding:20px}
-
-.mall-item-body h4{
-  margin:0 0 8px;
-  font-size:19px;
-}
-
-.mall-item-description{
-  color:#68747d;
-  font-size:13px;
-  line-height:1.55;
-  margin:0 0 15px;
-}
-
-.mall-price-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin-bottom:15px;
-}
-
-.mall-price{
-  color:#168f9b;
-  font-size:20px;
-  font-weight:900;
-}
-
-.mall-status-badge{
-  background:#e9f8ef;
-  color:#18733d;
-  padding:6px 9px;
-  border-radius:20px;
-  font-size:11px;
-  font-weight:bold;
-}
-
-.mall-details{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-.mall-detail{
-  background:#f7f8f9;
-  border-radius:7px;
-  padding:9px;
-}
-
-.mall-detail small{
-  display:block;
-  color:#7b858d;
-  font-size:10px;
-  margin-bottom:3px;
-}
-
-.mall-detail span{
-  font-size:12px;
-  font-weight:bold;
-  word-break:break-word;
-}
-
-.mall-receipt{
-  display:inline-block;
-  margin-top:15px;
-  color:#168f9b;
-  font-weight:bold;
-  font-size:13px;
-  text-decoration:none;
-}
-
-.mall-empty{
-  border:1px dashed #cbd3d8;
-  border-radius:12px;
-  padding:35px 20px;
-  text-align:center;
-  color:#68747d;
-  background:#fafbfb;
-}
-
-.mall-total{
-  margin-top:25px;
-  padding:20px;
-  border-radius:10px;
-  background:#eefafa;
-  border:1px solid #cce8e8;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-}
-
-.mall-total strong:last-child{
-  color:#168f9b;
-  font-size:22px;
-}
-
-.mall-back-button{
-  margin-top:25px;
-  border:0;
-  background:#168f9b;
-  color:#fff;
-  padding:13px 18px;
-  border-radius:7px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-@media(max-width:850px){
-  .mall-summary{grid-template-columns:1fr 1fr}
-  .mall-items-grid{grid-template-columns:1fr 1fr}
-}
-
-@media(max-width:600px){
-  .mall-content{padding:20px}
-  .mall-topbar{padding:24px 20px}
-  .mall-brand h2{font-size:25px}
-  .mall-summary{grid-template-columns:1fr}
-  .mall-items-grid{grid-template-columns:1fr}
-  .mall-item-image,.mall-item-placeholder{height:220px}
-  .mall-total{align-items:flex-start;flex-direction:column}
-}
-
 </style>
 </head>
 
@@ -2587,48 +2347,6 @@ footer a{
 </section>
 
 
-
-
-<!-- PRIVATE PACKAGE MALL ROOM -->
-<section id="packageMallRoom" class="package-mall-room">
-  <div class="container">
-    <div class="package-mall-shell">
-      <div class="mall-topbar">
-        <div class="mall-brand">
-          <small>PRIVATE CUSTOMER ROOM</small>
-          <h2>JESTILO Package Mall</h2>
-          <p>Your shipment, purchases and receipt information in one private room.</p>
-        </div>
-        <div class="mall-room-code">
-          Tracking Room: <strong id="mallRoomCode">-</strong>
-        </div>
-      </div>
-
-      <div class="mall-content">
-        <div class="mall-summary">
-          <div class="mall-summary-card"><small>Customer</small><strong id="mallCustomer">-</strong></div>
-          <div class="mall-summary-card"><small>Shipment Status</small><strong id="mallStatus">-</strong></div>
-          <div class="mall-summary-card"><small>Origin</small><strong id="mallOrigin">-</strong></div>
-          <div class="mall-summary-card"><small>Destination</small><strong id="mallDestination">-</strong></div>
-        </div>
-
-        <h3 class="mall-section-title">Purchased Items</h3>
-        <div id="mallItemsGrid" class="mall-items-grid"></div>
-
-        <div id="mallTotal" class="mall-total" style="display:none;">
-          <strong>Total Purchase Amount</strong>
-          <strong id="mallTotalAmount">-</strong>
-        </div>
-
-        <button type="button" class="mall-back-button" onclick="closePackageMallRoom()">
-          ← Back to Shipment Tracking
-        </button>
-      </div>
-    </div>
-  </div>
-</section>
-
-
 <section id="about" class="about">
 
   <div class="container about-grid">
@@ -3019,108 +2737,6 @@ setInterval(
    TRACK SHIPMENT
    ========================= */
 
-
-function formatMallMoney(value, currency){
-  const amount = Number(value);
-  if(!Number.isFinite(amount)) return (currency || '') + ' -';
-  try{
-    return new Intl.NumberFormat(undefined,{style:'currency',currency:currency || 'USD'}).format(amount);
-  }catch(e){
-    return (currency || '') + ' ' + amount.toFixed(2);
-  }
-}
-
-function mallValue(value){
-  return value === null || value === undefined || value === '' ? '-' : String(value);
-}
-
-function renderPackageMallRoom(shipment, mallData, code){
-  const room = document.getElementById('packageMallRoom');
-  const itemsGrid = document.getElementById('mallItemsGrid');
-  const totalBox = document.getElementById('mallTotal');
-  const totalAmount = document.getElementById('mallTotalAmount');
-
-  document.getElementById('mallRoomCode').textContent = mallValue(code);
-  document.getElementById('mallCustomer').textContent = mallValue(shipment.customer);
-  document.getElementById('mallStatus').textContent = mallValue(shipment.status || 'Shipment received');
-  document.getElementById('mallOrigin').textContent = mallValue(shipment.origin);
-  document.getElementById('mallDestination').textContent = mallValue(shipment.destination);
-
-  const items = Array.isArray(mallData) ? mallData :
-    (mallData && Array.isArray(mallData.items) ? mallData.items : []);
-
-  itemsGrid.innerHTML = '';
-
-  if(!items.length){
-    itemsGrid.innerHTML = '<div class="mall-empty" style="grid-column:1/-1;">No purchased items have been added to this shipment yet.</div>';
-    totalBox.style.display = 'none';
-  }else{
-    let total = 0;
-    let totalCurrency = items[0].currency || 'USD';
-
-    items.forEach(function(item){
-      const price = Number(item.price);
-      const quantity = Number(item.quantity) || 1;
-      if(Number.isFinite(price)) total += price * quantity;
-      totalCurrency = item.currency || totalCurrency;
-
-      const card = document.createElement('article');
-      card.className = 'mall-item-card';
-
-      const image = item.image_url ?
-        '<img class="mall-item-image" src="'+escapeMapHtml(item.image_url)+'" alt="'+escapeMapHtml(item.product_name || 'Purchased item')+'" loading="lazy">' :
-        '<div class="mall-item-placeholder">📦</div>';
-
-      card.innerHTML = image +
-        '<div class="mall-item-body">' +
-          '<h4>'+escapeMapHtml(item.product_name || 'Purchased item')+'</h4>' +
-          '<p class="mall-item-description">'+escapeMapHtml(item.description || 'No product description available.')+'</p>' +
-          '<div class="mall-price-row">' +
-            '<span class="mall-price">'+escapeMapHtml(formatMallMoney(item.price,item.currency))+'</span>' +
-            '<span class="mall-status-badge">'+escapeMapHtml(item.purchase_status || 'Purchased')+'</span>' +
-          '</div>' +
-          '<div class="mall-details">' +
-            '<div class="mall-detail"><small>Quantity</small><span>'+escapeMapHtml(mallValue(item.quantity))+'</span></div>' +
-            '<div class="mall-detail"><small>Size</small><span>'+escapeMapHtml(mallValue(item.size))+'</span></div>' +
-            '<div class="mall-detail"><small>Color</small><span>'+escapeMapHtml(mallValue(item.color))+'</span></div>' +
-            '<div class="mall-detail"><small>Style</small><span>'+escapeMapHtml(mallValue(item.style))+'</span></div>' +
-            '<div class="mall-detail"><small>Seller / Store</small><span>'+escapeMapHtml(mallValue(item.seller))+'</span></div>' +
-            '<div class="mall-detail"><small>Purchase Date</small><span>'+escapeMapHtml(formatDate(item.purchase_date))+'</span></div>' +
-          '</div>' +
-          (item.receipt_url ? '<a class="mall-receipt" href="'+escapeMapHtml(item.receipt_url)+'" target="_blank" rel="noopener noreferrer">View Receipt →</a>' : '') +
-        '</div>';
-
-      itemsGrid.appendChild(card);
-    });
-
-    totalBox.style.display = 'flex';
-    totalAmount.textContent = formatMallMoney(total,totalCurrency);
-  }
-
-  room.style.display = 'block';
-}
-
-async function loadPackageMallRoom(shipment, code){
-  try{
-    const response = await fetch('/api/shipments/' + encodeURIComponent(code) + '/mall');
-    if(response.ok){
-      const mallData = await response.json();
-      renderPackageMallRoom(shipment,mallData,code);
-      return;
-    }
-  }catch(error){
-    console.warn('Package Mall could not be loaded:',error);
-  }
-  renderPackageMallRoom(shipment,[],code);
-}
-
-function closePackageMallRoom(){
-  const room = document.getElementById('packageMallRoom');
-  if(room) room.style.display = 'none';
-  const tracking = document.getElementById('tracking');
-  if(tracking) tracking.scrollIntoView({behavior:'smooth',block:'start'});
-}
-
 async function trackShipment(){
 
   const input =
@@ -3129,19 +2745,11 @@ async function trackShipment(){
   const errorBox =
     document.getElementById("error");
 
-  const resultSection =
-    document.getElementById("resultSection");
-
-  const mapBox =
-    document.getElementById("shipmentMapBox");
-
   const code =
     input.value.trim().toUpperCase();
 
-
   errorBox.style.display = "none";
   errorBox.textContent = "";
-
 
   if(!code){
 
@@ -3151,12 +2759,15 @@ async function trackShipment(){
     errorBox.style.display =
       "block";
 
-    resultSection.style.display =
-      "none";
-
     return;
   }
 
+  /*
+    The public homepage remains clean.
+    A valid tracking number opens the customer's
+    private shipment room instead of displaying
+    the package information underneath the homepage.
+  */
 
   try{
 
@@ -3165,7 +2776,6 @@ async function trackShipment(){
         "/api/shipments/" +
         encodeURIComponent(code)
       );
-
 
     if(!response.ok){
 
@@ -3184,152 +2794,12 @@ async function trackShipment(){
       errorBox.style.display =
         "block";
 
-      resultSection.style.display =
-        "none";
-
-      mapBox.style.display =
-        "none";
-
       return;
     }
 
-
-    const shipment =
-      await response.json();
-
-
-    document.getElementById(
-      "resultCode"
-    ).textContent =
-      shipment.code || code;
-
-
-    document.getElementById(
-      "resultStatus"
-    ).textContent =
-      shipment.status || "Shipment received";
-
-
-    document.getElementById(
-      "resultOrigin"
-    ).textContent =
-      shipment.origin || "-";
-
-
-    document.getElementById(
-      "resultDestination"
-    ).textContent =
-      shipment.destination || "-";
-
-
-    document.getElementById(
-      "resultCustomer"
-    ).textContent =
-      shipment.customer || "-";
-
-
-    document.getElementById(
-      "resultLocation"
-    ).textContent =
-      shipment.location || "-";
-
-
-    document.getElementById(
-      "resultDelivery"
-    ).textContent =
-      formatDate(
-        shipment.estimated_delivery
-      );
-
-
-    document.getElementById(
-      "resultUpdated"
-    ).textContent =
-      formatDate(
-        shipment.updated
-      );
-
-
-    document.getElementById(
-      "resultItem"
-    ).textContent =
-      shipment.item_name ||
-      "Shipment";
-
-
-    document.getElementById(
-      "resultDescription"
-    ).textContent =
-      shipment.item_description ||
-      "No package description available.";
-
-
-    document.getElementById(
-      "resultNote"
-    ).textContent =
-      shipment.note ||
-      "No additional update available.";
-
-
-    /* PACKAGE IMAGE */
-
-    const image =
-      document.getElementById(
-        "packageImage"
-      );
-
-
-    if(
-      shipment.image_url &&
-      shipment.image_url.startsWith(
-        "data:image/"
-      )
-    ){
-
-      image.src =
-        shipment.image_url;
-
-      image.style.display =
-        "block";
-
-    }else{
-
-      image.src =
-        "";
-
-      image.style.display =
-        "none";
-
-    }
-
-
-    /* TIMELINE */
-
-    updateTimeline(
-      shipment.status
-    );
-
-
-    resultSection.style.display =
-      "block";
-
-
-    showShipmentMap(
-      shipment
-    );
-
-
-    await loadPackageMallRoom(
-      shipment,
-      code
-    );
-
-
-    document.getElementById("packageMallRoom").scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
-
+    window.location.href =
+      "/package-room.html?code=" +
+      encodeURIComponent(code);
 
   }catch(error){
 
@@ -3340,10 +2810,6 @@ async function trackShipment(){
 
     errorBox.style.display =
       "block";
-
-    resultSection.style.display =
-      "none";
-
   }
 
 }

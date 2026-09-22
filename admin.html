@@ -775,12 +775,13 @@ td{
 
     <div class="file-box">
 
-      <h3
-        id="mallFormTitle"
-        style="margin-top:0"
-      >
+      <h3 id="mallFormTitle" style="margin-top:0">
         Add Purchased Item
       </h3>
+
+      <p id="mallItemCount" class="help" style="margin:6px 0 18px">
+        Items added: 0
+      </p>
 
       <label>
         Product Image
@@ -924,9 +925,9 @@ td{
       </button>
 
       <button
-        id="mallSaveButton"
+        id="mallSaveEditButton"
         type="button"
-        class="edit hidden"
+        class="hidden"
         onclick="saveMallItemChanges()"
       >
         Save Changes
@@ -942,7 +943,6 @@ td{
       </button>
 
       <button
-        id="mallClearButton"
         type="button"
         class="clear"
         onclick="clearMallForm()"
@@ -1927,6 +1927,7 @@ async function deleteShipment(
 let currentMallTrackingCode = "";
 let editingMallItemId = null;
 let editingMallOriginalImage = "";
+let mallItemsCache = [];
 
 
 /* IMAGE PREVIEW */
@@ -2114,10 +2115,17 @@ async function loadMallItems(){
 
 function renderMallItems(items){
 
+  mallItemsCache = items || [];
+
   const box =
     document.getElementById(
       "mallRecords"
     );
+
+  const count = document.getElementById("mallItemCount");
+  if(count){
+    count.textContent = "Items added: " + items.length;
+  }
 
   if(!items.length){
 
@@ -2189,11 +2197,10 @@ function renderMallItems(items){
             <button
               type="button"
               class="edit"
-              onclick='editMallItem(${JSON.stringify(item).replace(/'/g, "&#39;")})'
+              onclick="editMallItemById(${Number(item.id)})"
             >
               Edit
             </button>
-
             <button
               type="button"
               class="delete"
@@ -2211,139 +2218,6 @@ function renderMallItems(items){
 
   `;
 
-}
-
-
-/* EDIT ITEM */
-
-function editMallItem(item){
-
-  editingMallItemId = Number(item.id);
-  editingMallOriginalImage = item.image_url || "";
-
-  document.getElementById("mallFormTitle").textContent =
-    "Edit Purchased Item";
-
-  document.getElementById("mall_product_name").value = item.product_name || "";
-  document.getElementById("mall_description").value = item.description || "";
-  document.getElementById("mall_price").value = item.price ?? "";
-  document.getElementById("mall_currency").value = item.currency || "";
-  document.getElementById("mall_quantity").value = item.quantity || 1;
-  document.getElementById("mall_size").value = item.size || "";
-  document.getElementById("mall_color").value = item.color || "";
-  document.getElementById("mall_style").value = item.style || "";
-  document.getElementById("mall_seller").value = item.seller || "";
-  document.getElementById("mall_purchase_status").value = item.purchase_status || "Purchased";
-  document.getElementById("mall_purchase_date").value =
-    item.purchase_date ? String(item.purchase_date).slice(0,10) : "";
-  document.getElementById("mall_receipt_url").value = item.receipt_url || "";
-
-  const preview = document.getElementById("mallImagePreview");
-
-  if(item.image_url){
-    preview.src = item.image_url;
-    preview.classList.remove("hidden");
-  }else{
-    preview.src = "";
-    preview.classList.add("hidden");
-  }
-
-  document.getElementById("mallAddButton").classList.add("hidden");
-  document.getElementById("mallSaveButton").classList.remove("hidden");
-  document.getElementById("mallCancelEditButton").classList.remove("hidden");
-  document.getElementById("mallClearButton").classList.add("hidden");
-
-  document.getElementById("mallForm").scrollIntoView({
-    behavior:"smooth",
-    block:"start"
-  });
-}
-
-
-/* SAVE EDITED ITEM */
-
-async function saveMallItemChanges(){
-
-  if(!editingMallItemId){
-    return;
-  }
-
-  const productName = document.getElementById("mall_product_name").value.trim();
-
-  if(!productName){
-    alert("Enter the product name.");
-    return;
-  }
-
-  const preview = document.getElementById("mallImagePreview");
-
-  const payload = {
-    product_name: productName,
-    description: document.getElementById("mall_description").value.trim(),
-    image_url: preview.src || editingMallOriginalImage || "",
-    price: document.getElementById("mall_price").value,
-    currency: document.getElementById("mall_currency").value.trim(),
-    quantity: document.getElementById("mall_quantity").value,
-    size: document.getElementById("mall_size").value.trim(),
-    color: document.getElementById("mall_color").value.trim(),
-    style: document.getElementById("mall_style").value.trim(),
-    seller: document.getElementById("mall_seller").value.trim(),
-    purchase_status: document.getElementById("mall_purchase_status").value,
-    purchase_date: document.getElementById("mall_purchase_date").value,
-    receipt_url: document.getElementById("mall_receipt_url").value.trim()
-  };
-
-  try{
-    const response = await fetch(
-      "/api/admin/mall/" + encodeURIComponent(editingMallItemId),
-      {
-        method:"PUT",
-        headers:{
-          "Content-Type":"application/json",
-          "Authorization":"Bearer " + token
-        },
-        body:JSON.stringify(payload)
-      }
-    );
-
-    if(response.status === 401){
-      clearToken();
-      return;
-    }
-
-    const data = await response.json().catch(() => ({}));
-
-    if(!response.ok){
-      alert(data.error || "Could not update Mall item.");
-      return;
-    }
-
-    alert("Purchased item updated successfully.");
-    cancelMallEdit();
-    await loadMallItems();
-
-  }catch(error){
-    console.error(error);
-    alert("Could not connect to the server.");
-  }
-}
-
-
-/* CANCEL EDIT */
-
-function cancelMallEdit(){
-  editingMallItemId = null;
-  editingMallOriginalImage = "";
-
-  document.getElementById("mallFormTitle").textContent =
-    "Add Purchased Item";
-
-  document.getElementById("mallAddButton").classList.remove("hidden");
-  document.getElementById("mallSaveButton").classList.add("hidden");
-  document.getElementById("mallCancelEditButton").classList.add("hidden");
-  document.getElementById("mallClearButton").classList.remove("hidden");
-
-  clearMallForm();
 }
 
 
@@ -2537,6 +2411,122 @@ async function addMallItem(){
 
 }
 
+
+/* EDIT ITEM */
+
+function editMallItemById(id){
+  const item = mallItemsCache.find(row => Number(row.id) === Number(id));
+  if(!item){
+    alert("Purchased item could not be found.");
+    return;
+  }
+  editMallItem(item);
+}
+
+function editMallItem(item){
+
+  editingMallItemId = Number(item.id);
+  editingMallOriginalImage = item.image_url || "";
+
+  document.getElementById("mallFormTitle").textContent = "Edit Purchased Item";
+  document.getElementById("mallAddButton").classList.add("hidden");
+  document.getElementById("mallSaveEditButton").classList.remove("hidden");
+  document.getElementById("mallCancelEditButton").classList.remove("hidden");
+
+  document.getElementById("mall_product_name").value = item.product_name || "";
+  document.getElementById("mall_description").value = item.description || "";
+  document.getElementById("mall_price").value = item.price ?? "";
+  document.getElementById("mall_currency").value = item.currency || "";
+  document.getElementById("mall_quantity").value = item.quantity || 1;
+  document.getElementById("mall_size").value = item.size || "";
+  document.getElementById("mall_color").value = item.color || "";
+  document.getElementById("mall_style").value = item.style || "";
+  document.getElementById("mall_seller").value = item.seller || "";
+  document.getElementById("mall_purchase_status").value = item.purchase_status || "Purchased";
+  document.getElementById("mall_purchase_date").value = item.purchase_date ? String(item.purchase_date).slice(0,10) : "";
+  document.getElementById("mall_receipt_url").value = item.receipt_url || "";
+
+  const preview = document.getElementById("mallImagePreview");
+  if(item.image_url){
+    preview.src = item.image_url;
+    preview.classList.remove("hidden");
+  }else{
+    preview.src = "";
+    preview.classList.add("hidden");
+  }
+
+  document.getElementById("mall_product_name").scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+async function saveMallItemChanges(){
+
+  if(!editingMallItemId || !currentMallTrackingCode){
+    alert("Load a tracking number first.");
+    return;
+  }
+
+  const productName = document.getElementById("mall_product_name").value.trim();
+  if(!productName){
+    alert("Enter the product name.");
+    return;
+  }
+
+  const preview = document.getElementById("mallImagePreview");
+
+  const payload = {
+    product_name: productName,
+    description: document.getElementById("mall_description").value.trim(),
+    image_url: preview.src || editingMallOriginalImage || "",
+    price: document.getElementById("mall_price").value,
+    currency: document.getElementById("mall_currency").value.trim(),
+    quantity: document.getElementById("mall_quantity").value,
+    size: document.getElementById("mall_size").value.trim(),
+    color: document.getElementById("mall_color").value.trim(),
+    style: document.getElementById("mall_style").value.trim(),
+    seller: document.getElementById("mall_seller").value.trim(),
+    purchase_status: document.getElementById("mall_purchase_status").value,
+    purchase_date: document.getElementById("mall_purchase_date").value,
+    receipt_url: document.getElementById("mall_receipt_url").value.trim()
+  };
+
+  try{
+    const response = await fetch("/api/admin/mall/" + encodeURIComponent(editingMallItemId), {
+      method:"PUT",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer " + token
+      },
+      body:JSON.stringify(payload)
+    });
+
+    if(response.status === 401){
+      clearToken();
+      return;
+    }
+
+    const data = await response.json();
+    if(!response.ok){
+      alert(data.error || "Could not update Mall item.");
+      return;
+    }
+
+    cancelMallEdit();
+    await loadMallItems();
+  }catch(error){
+    console.error(error);
+    alert("Could not connect to the server.");
+  }
+}
+
+function cancelMallEdit(){
+  editingMallItemId = null;
+  editingMallOriginalImage = "";
+  document.getElementById("mallFormTitle").textContent = "Add Purchased Item";
+  document.getElementById("mallAddButton").classList.remove("hidden");
+  document.getElementById("mallSaveEditButton").classList.add("hidden");
+  document.getElementById("mallCancelEditButton").classList.add("hidden");
+  clearMallForm();
+}
 
 /* DELETE ITEM */
 

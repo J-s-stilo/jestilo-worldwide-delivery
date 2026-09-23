@@ -13,6 +13,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/admin", (req, res) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   res.sendFile(path.join(__dirname, "admin.html"));
 });
 
@@ -22,6 +25,9 @@ app.get("/admin", (req, res) => {
  * package-room.html must sit beside server.js/index.html.
  */
 app.get("/package-room.html", (req, res) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   res.sendFile(path.join(__dirname, "package-room.html"));
 });
 
@@ -153,53 +159,15 @@ async function setupDatabase() {
     )
   `);
 
-  // Repair older databases where package_mall_items timestamps were
-  // created as TEXT. The current schema requires real timestamps.
-  const mallCols = await pool.query(`
-    SELECT column_name, data_type
-    FROM information_schema.columns
-    WHERE table_schema = 'public'
-      AND table_name = 'package_mall_items'
-      AND column_name IN ('created_at','updated_at')
-  `);
-  const mallTypes = Object.fromEntries(mallCols.rows.map(r => [r.column_name, r.data_type]));
+  /*
+     IMPORTANT: older JESTILO databases may have created_at / updated_at
+     stored as TEXT. Never use COALESCE(text, NOW()) because PostgreSQL
+     cannot match TEXT with TIMESTAMPTZ.
 
-  if (mallTypes.created_at === 'text') {
-    await pool.query(`
-      ALTER TABLE package_mall_items
-      ALTER COLUMN created_at TYPE TIMESTAMPTZ
-      USING CASE
-        WHEN created_at IS NULL OR btrim(created_at) = '' THEN NULL
-        ELSE created_at::timestamptz
-      END
-    `);
-  }
-
-  if (mallTypes.updated_at === 'text') {
-    await pool.query(`
-      ALTER TABLE package_mall_items
-      ALTER COLUMN updated_at TYPE TIMESTAMPTZ
-      USING CASE
-        WHEN updated_at IS NULL OR btrim(updated_at) = '' THEN NULL
-        ELSE updated_at::timestamptz
-      END
-    `);
-  }
-
-  await pool.query(`
-    UPDATE package_mall_items
-    SET created_at = COALESCE(created_at, NOW()),
-        updated_at = COALESCE(updated_at, NOW())
-    WHERE created_at IS NULL OR updated_at IS NULL
-  `);
-
-  await pool.query(`
-    ALTER TABLE package_mall_items
-    ALTER COLUMN created_at SET DEFAULT NOW(),
-    ALTER COLUMN updated_at SET DEFAULT NOW(),
-    ALTER COLUMN created_at SET NOT NULL,
-    ALTER COLUMN updated_at SET NOT NULL
-  `);
+     We keep these fields compatible with both old TEXT columns and new
+     TIMESTAMPTZ columns by supplying ISO timestamps from Node on every
+     insert/update. No destructive migration is performed at startup.
+  */
 
   await pool.query(`
     CREATE INDEX IF NOT EXISTS idx_package_mall_tracking_code
@@ -620,8 +588,11 @@ app.post(
     const token =
       createAdminToken();
 
+    /* Tell the browser to discard any stale cached admin session. */
+    res.setHeader("Cache-Control", "no-store");
 
     res.json({
+      ok: true,
       token
     });
 
@@ -853,6 +824,8 @@ app.post(
         });
       }
 
+      const now = new Date().toISOString();
+
       const result =
         await pool.query(
           `
@@ -872,7 +845,7 @@ app.post(
           )
           VALUES
           (
-            $1,$2,$3,$4,$5,$6,$7,$8,$9,NOW(),NOW()
+            $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$10
           )
           RETURNING *
           `,
@@ -885,7 +858,8 @@ app.post(
             quantity,
             seller,
             purchaseStatus,
-            purchaseDate
+            purchaseDate,
+            now
           ]
         );
 
@@ -958,6 +932,8 @@ app.put(
         });
       }
 
+      const now = new Date().toISOString();
+
       const result =
         await pool.query(
           `
@@ -971,8 +947,8 @@ app.put(
             seller = $5,
             purchase_status = $6,
             purchase_date = $7,
-            updated_at = NOW()
-          WHERE id = $8
+            updated_at = $8
+          WHERE id = $9
           RETURNING *
           `,
           [
@@ -983,6 +959,7 @@ app.put(
             seller,
             purchaseStatus,
             purchaseDate,
+            now,
             id
           ]
         );

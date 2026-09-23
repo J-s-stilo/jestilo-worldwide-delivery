@@ -5,7 +5,7 @@ const crypto = require("crypto");
 
 const app = express();
 
-app.use(express.json({ limit: "2mb" }));
+app.use(express.json({ limit: "12mb" }));
 app.use(express.static(__dirname));
 
 app.get("/", (req, res) => {
@@ -148,10 +148,44 @@ async function setupDatabase() {
       seller TEXT DEFAULT '',
       purchase_status TEXT DEFAULT 'Purchased',
       purchase_date TEXT DEFAULT '',
+      description TEXT DEFAULT '',
+      size TEXT DEFAULT '',
+      color TEXT DEFAULT '',
+      style TEXT DEFAULT '',
+      receipt_url TEXT DEFAULT '',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
+
+  const mallColumns = [
+    ["description", "TEXT DEFAULT ''"],
+    ["size", "TEXT DEFAULT ''"],
+    ["color", "TEXT DEFAULT ''"],
+    ["style", "TEXT DEFAULT ''"],
+    ["receipt_url", "TEXT DEFAULT ''"]
+  ];
+
+  for (const [name, definition] of mallColumns) {
+    await pool.query(`
+      ALTER TABLE package_mall_items
+      ADD COLUMN IF NOT EXISTS ${name} ${definition}
+    `);
+  }
+
+  /* Keep older databases compatible with the full Package Mall fields. */
+  for (const [name, definition] of [
+    ["description", "TEXT DEFAULT ''"],
+    ["size", "TEXT DEFAULT ''"],
+    ["color", "TEXT DEFAULT ''"],
+    ["style", "TEXT DEFAULT ''"],
+    ["receipt_url", "TEXT DEFAULT ''"]
+  ]) {
+    await pool.query(`
+      ALTER TABLE package_mall_items
+      ADD COLUMN IF NOT EXISTS ${name} ${definition}
+    `);
+  }
 
   await pool.query(`
     CREATE INDEX IF NOT EXISTS idx_package_mall_tracking_code
@@ -670,13 +704,18 @@ app.get(
             id,
             tracking_code,
             product_name,
+            description,
             image_url,
             price,
             currency,
             quantity,
+            size,
+            color,
+            style,
             seller,
             purchase_status,
             purchase_date,
+            receipt_url,
             created_at,
             updated_at
           FROM package_mall_items
@@ -686,7 +725,10 @@ app.get(
           [code]
         );
 
-      res.json(result.rows);
+      res.json({
+        tracking_code: code,
+        items: result.rows
+      });
     } catch (error) {
       console.error("Customer mall error:", error);
       res.status(500).json({
@@ -722,7 +764,10 @@ app.get(
           [code]
         );
 
-      res.json(result.rows);
+      res.json({
+        tracking_code: code,
+        items: result.rows
+      });
     } catch (error) {
       console.error("Admin mall list error:", error);
       res.status(500).json({
@@ -763,83 +808,55 @@ app.post(
         });
       }
 
-      const data = req.body || {};
+      const body = req.body || {};
+      const incomingItems = Array.isArray(body.items) ? body.items : [body];
 
-      const productName =
-        String(data.product_name || "").trim();
+      const normalizedItems = incomingItems.map((data) => {
+        const productName = String(data.product_name || data.productName || data.name || "").trim();
+        const imageUrl = String(data.image_url || data.imageUrl || "").trim();
+        const description = String(data.description || "").trim();
+        const currency = String(data.currency || "USD").trim() || "USD";
+        const quantity = Math.max(1, parseInt(data.quantity, 10) || 1);
+        const priceNumber = Number(data.price);
+        const price = Number.isFinite(priceNumber) && priceNumber >= 0 ? priceNumber : 0;
+        const seller = String(data.seller || data.store || "").trim();
+        const purchaseDate = String(data.purchase_date || data.purchaseDate || "").trim();
+        const purchaseStatus = String(data.purchase_status || data.purchaseStatus || "Purchased").trim() || "Purchased";
+        const size = String(data.size || "").trim();
+        const color = String(data.color || "").trim();
+        const style = String(data.style || "").trim();
+        const receiptUrl = String(data.receipt_url || data.receiptUrl || "").trim();
+        return { productName, imageUrl, description, currency, quantity, price, seller, purchaseStatus, purchaseDate, size, color, style, receiptUrl };
+      });
 
-      const imageUrl =
-        String(data.image_url || "").trim();
-
-      const seller =
-        String(data.seller || "").trim();
-
-      const currency = "USD";
-
-      const quantity =
-        Math.max(
-          1,
-          parseInt(data.quantity, 10) || 1
-        );
-
-      const priceNumber =
-        Number(data.price);
-
-      const price =
-        Number.isFinite(priceNumber) && priceNumber >= 0
-          ? priceNumber
-          : 0;
-
-      const purchaseDate =
-        String(data.purchase_date || "").trim();
-
-      const purchaseStatus =
-        String(
-          data.purchase_status ||
-          "Purchased"
-        ).trim();
-
-      if (!productName) {
-        return res.status(400).json({
-          error: "Product name required"
-        });
+      if (!normalizedItems.length || normalizedItems.some(item => !item.productName)) {
+        return res.status(400).json({ error: "Product name required" });
       }
 
-      const result =
-        await pool.query(
-          `
-          INSERT INTO package_mall_items
-          (
-            tracking_code,
-            product_name,
-            image_url,
-            price,
-            currency,
-            quantity,
-            seller,
-            purchase_status,
-            purchase_date
-          )
-          VALUES
-          (
-            $1,$2,$3,$4,$5,$6,$7,$8,$9
-          )
-          RETURNING *
-          `,
-          [
-            code,
-            productName,
-            imageUrl,
-            price,
-            currency,
-            quantity,
-            seller,
-            purchaseStatus,
-            purchaseDate
-          ]
-        );
-
-      res.status(201).json(result.rows[0]);
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const saved = [];
+        for (const item of normalizedItems) {
+          const result = await client.query(
+            `
+            INSERT INTO package_mall_items
+            (tracking_code, product_name, description, image_url, price, currency, quantity, size, color, style, seller, purchase_status, purchase_date, receipt_url)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+            RETURNING *
+            `,
+            [code, item.productName, item.description, item.imageUrl, item.price, item.currency, item.quantity, item.size, item.color, item.style, item.seller, item.purchaseStatus, item.purchaseDate, item.receiptUrl]
+          );
+          saved.push(result.rows[0]);
+        }
+        await client.query("COMMIT");
+        res.status(201).json({ tracking_code: code, items: saved, saved_count: saved.length });
+      } catch (dbError) {
+        await client.query("ROLLBACK");
+        throw dbError;
+      } finally {
+        client.release();
+      }
     } catch (error) {
       console.error("Add mall item error:", error);
       res.status(500).json({
@@ -914,25 +931,36 @@ app.put(
           UPDATE package_mall_items
           SET
             product_name = $1,
-            image_url = $2,
-            price = $3,
-            currency = 'USD',
-            quantity = $4,
-            seller = $5,
-            purchase_status = $6,
-            purchase_date = $7,
+            description = $2,
+            image_url = $3,
+            price = $4,
+            currency = $5,
+            quantity = $6,
+            size = $7,
+            color = $8,
+            style = $9,
+            seller = $10,
+            purchase_status = $11,
+            purchase_date = $12,
+            receipt_url = $13,
             updated_at = NOW()
-          WHERE id = $8
+          WHERE id = $14
           RETURNING *
           `,
           [
             productName,
+            String(data.description || "").trim(),
             imageUrl,
             price,
+            String(data.currency || "USD").trim() || "USD",
             quantity,
+            String(data.size || "").trim(),
+            String(data.color || "").trim(),
+            String(data.style || "").trim(),
             seller,
             purchaseStatus,
             purchaseDate,
+            String(data.receipt_url || "").trim(),
             id
           ]
         );

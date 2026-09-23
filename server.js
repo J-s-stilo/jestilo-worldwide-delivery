@@ -13,9 +13,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/admin", (req, res) => {
-  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
   res.sendFile(path.join(__dirname, "admin.html"));
 });
 
@@ -25,9 +22,6 @@ app.get("/admin", (req, res) => {
  * package-room.html must sit beside server.js/index.html.
  */
 app.get("/package-room.html", (req, res) => {
-  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "0");
   res.sendFile(path.join(__dirname, "package-room.html"));
 });
 
@@ -159,13 +153,38 @@ async function setupDatabase() {
     )
   `);
 
-  /* Existing databases may already have these columns but without
-     the defaults used by the original table definition. Repair them. */
-  await pool.query(`
-    ALTER TABLE package_mall_items
-    ALTER COLUMN created_at SET DEFAULT NOW(),
-    ALTER COLUMN updated_at SET DEFAULT NOW()
+  // Repair older databases where package_mall_items timestamps were
+  // created as TEXT. The current schema requires real timestamps.
+  const mallCols = await pool.query(`
+    SELECT column_name, data_type
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'package_mall_items'
+      AND column_name IN ('created_at','updated_at')
   `);
+  const mallTypes = Object.fromEntries(mallCols.rows.map(r => [r.column_name, r.data_type]));
+
+  if (mallTypes.created_at === 'text') {
+    await pool.query(`
+      ALTER TABLE package_mall_items
+      ALTER COLUMN created_at TYPE TIMESTAMPTZ
+      USING CASE
+        WHEN created_at IS NULL OR btrim(created_at) = '' THEN NULL
+        ELSE created_at::timestamptz
+      END
+    `);
+  }
+
+  if (mallTypes.updated_at === 'text') {
+    await pool.query(`
+      ALTER TABLE package_mall_items
+      ALTER COLUMN updated_at TYPE TIMESTAMPTZ
+      USING CASE
+        WHEN updated_at IS NULL OR btrim(updated_at) = '' THEN NULL
+        ELSE updated_at::timestamptz
+      END
+    `);
+  }
 
   await pool.query(`
     UPDATE package_mall_items
@@ -176,6 +195,8 @@ async function setupDatabase() {
 
   await pool.query(`
     ALTER TABLE package_mall_items
+    ALTER COLUMN created_at SET DEFAULT NOW(),
+    ALTER COLUMN updated_at SET DEFAULT NOW(),
     ALTER COLUMN created_at SET NOT NULL,
     ALTER COLUMN updated_at SET NOT NULL
   `);
@@ -599,11 +620,8 @@ app.post(
     const token =
       createAdminToken();
 
-    /* Tell the browser to discard any stale cached admin session. */
-    res.setHeader("Cache-Control", "no-store");
 
     res.json({
-      ok: true,
       token
     });
 
